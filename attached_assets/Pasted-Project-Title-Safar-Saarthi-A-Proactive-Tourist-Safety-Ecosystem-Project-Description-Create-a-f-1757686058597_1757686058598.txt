@@ -1,0 +1,186 @@
+Project Title:
+Safar Saarthi – A Proactive Tourist Safety Ecosystem
+
+Project Description:
+Create a fully structured and runnable Flutter prototype for Safar Saarthi, a tourist safety app designed to provide real-time alerts, location sharing, emergency assistance, and safety tips. The app should simulate backend functionality using API calls and placeholder data while focusing on clean UI, responsiveness, and user experience.
+
+The prototype will use Flutter with state management, mapping, and simulated API interactions. It must look polished and be interactive with smooth navigation and animations.
+
+Your task is to generate the complete file structure, codebase, and configuration for the Safar Saarthi Flutter prototype in the Replit environment. The app should be fully functional within the simulation constraints and follow industry best practices.
+
+Use the following content exactly and run flutter pub get after creating it.
+
+name: safar_saarthi
+description: A proactive tourist safety Flutter application prototype.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  google_sign_in: ^6.1.5
+  flutter_riverpod: ^2.4.9
+  mapbox_gl: ^0.16.0
+  http: ^1.1.0
+  qr_flutter: ^4.1.0
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+Step 3 – Functional Requirements:
+✅ General Rules
+
+Follow modern Dart best practices and null safety.
+
+All backend interactions are simulated via the http package.
+
+Avoid placeholder comments; fully implement all functionality.
+
+Write detailed comments explaining key functionalities.
+
+Ensure the UI is polished, accessible, and consistent.
+
+✅ Main Features
+
+1️⃣ Navigation & Main Structure
+
+Implement a BottomNavigationBar with Home, Map, SOS, Tips, and Profile tabs.
+
+Use Flutter’s setState within StatefulWidgets for state management.
+
+2️⃣ Home Screen
+
+AppBar with “Safar Saathi App”, user icon, and hamburger menu.
+
+Welcome message with bold typography.
+
+Search bar styled with rounded corners.
+
+Quick Safety Actions:
+
+SOS button navigates to SOS screen.
+
+Share location triggers snackbar “Location sharing initiated.”
+
+Digital ID button navigates to Profile.
+
+Dashboard with mock data:
+
+Current Status, Location, Alerts.
+
+Map snippet with mock data.
+
+Safety alerts scrollable list.
+
+Chatbot floating button showing “AI Chatbot coming soon!”
+
+3️⃣ Map Screen
+
+Full-screen interactive map using Mapbox.
+
+Show user location and risk zones.
+
+Add markers for services like Tourist Police and Hospitals.
+
+4️⃣ SOS Screen
+
+Large red “CONFIRM SOS” button.
+
+Countdown timer that auto-confirms in 5 seconds.
+
+Cancel option.
+
+API simulation to send alerts.
+
+Offline fallback message if no connection.
+
+5️⃣ Tips Screen
+
+Scrollable list of safety tips inside cards.
+
+Populate with at least 5 safety tips.
+
+6️⃣ Profile Screen
+
+Show user’s name and email.
+
+Display QR code with a mock ID.
+
+Language dropdown and privacy toggle for location tracking.
+
+🎨 UI Styling Guidelines:
+
+Use rounded corners and subtle shadows for buttons and cards.
+
+Apply gradients or accent colors for important actions like SOS.
+
+Keep spacing consistent with padding and margins.
+
+Use responsive layouts suitable for both mobile and tablet views.
+
+Add animations where applicable (hover effects, button presses, and transitions).
+
+
+Step 4 – Populate All Files:
+services/auth_service.dart
+
+Handle Firebase Authentication with Google sign-in.
+
+Provide signInWithGoogle(), signOut(), and a Stream<User?>.
+
+services/api_service.dart
+
+Simulate backend interactions like SOS alerts.
+
+main.dart
+
+Initialize Firebase.
+
+Setup ProviderScope for Riverpod.
+
+Route users based on authentication state.
+
+screens/wrapper.dart
+
+Display navigation if authenticated; otherwise, show login screen.
+
+screens/auth_screen.dart
+
+UI for login with Google sign-in.
+
+widgets/bottom_nav_bar.dart
+
+Manage tab switching and screen navigation.
+
+screens/home_screen.dart
+
+Implement all UI elements and mock data as described.
+
+screens/map_screen.dart
+
+Display Mapbox with markers and overlays.
+
+screens/sos_screen.dart
+
+Implement SOS alert functionality with fallback behavior.
+
+screens/tips_screen.dart
+
+Scrollable list of safety tips.
+
+screens/profile_screen.dart
+
+Show QR code, user details, language options, and privacy toggle.
