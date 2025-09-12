@@ -44,14 +44,28 @@ export default function MapScreen() {
           </svg>
         </div>
 
-        {/* User Location Marker */}
+        {/* RGIPT Location Marker - Blue Popup */}
         <div 
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
-          data-testid="marker-user-location"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer"
+          onClick={() => setSelectedMarker(selectedMarker === "rgipt" ? null : "rgipt")}
+          data-testid="marker-rgipt"
         >
-          <div className="relative">
-            <div className="w-6 h-6 bg-primary rounded-full border-4 border-white shadow-lg animate-pulse"></div>
-            <div className="absolute inset-0 w-6 h-6 bg-primary/30 rounded-full animate-ping"></div>
+          <div className="relative group">
+            {/* Blue marker with enhanced visibility */}
+            <div className="w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg hover:scale-110 transition-transform duration-200">
+              <div className="absolute inset-0 w-8 h-8 bg-primary/30 rounded-full animate-ping"></div>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <MapPin className="h-4 w-4 text-white" />
+              </div>
+            </div>
+            
+            {/* Tooltip on hover */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded whitespace-nowrap shadow-lg">
+                RGIPT Campus
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-primary"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -131,17 +145,31 @@ export default function MapScreen() {
 
         {/* Selected Marker Info */}
         {selectedMarker && (
-          <Card className="absolute bottom-4 right-4 z-30 bg-background/95 backdrop-blur-sm max-w-xs">
+          <Card className="absolute bottom-4 right-4 z-30 bg-background/95 backdrop-blur-sm max-w-xs" data-testid="popup-rgipt">
             <CardContent className="p-3">
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="font-semibold text-sm" data-testid="text-marker-title">
-                    {locationData.safeZones.find(l => l.id === selectedMarker)?.name ||
-                     locationData.riskZones.find(l => l.id === selectedMarker)?.name}
+                    {selectedMarker === "rgipt" ? "RGIPT, Jais, Amethi" :
+                     (locationData.safeZones.find(l => l.id === selectedMarker)?.name ||
+                      locationData.riskZones.find(l => l.id === selectedMarker)?.name)}
                   </h4>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Tap for directions and more info
+                    {selectedMarker === "rgipt" ? 
+                      "Rajiv Gandhi Institute of Petroleum Technology Campus" :
+                      "Tap for directions and more info"}
                   </p>
+                  {selectedMarker === "rgipt" && (
+                    <div className="mt-2 space-y-1">
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        <span>26.15°N, 81.51°E</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        Your Current Location
+                      </Badge>
+                    </div>
+                  )}
                 </div>
                 <Button 
                   variant="ghost" 
