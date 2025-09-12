@@ -14,13 +14,24 @@ import SOSScreen from "@/components/SOSScreen";
 import TipsScreen from "@/components/TipsScreen";
 import ProfileScreen from "@/components/ProfileScreen";
 import BottomNavigation from "@/components/BottomNavigation";
+import ChatButton from "@/components/ChatButton";
+import ChatPanel from "@/components/ChatPanel";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedApp() {
   const [activeTab, setActiveTab] = useState("home");
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleNavigate = (screen: string) => {
     setActiveTab(screen);
+  };
+
+  const handleChatOpen = () => {
+    setIsChatOpen(true);
+  };
+
+  const handleChatClose = () => {
+    setIsChatOpen(false);
   };
 
   return (
@@ -45,6 +56,10 @@ function AuthenticatedApp() {
       </Switch>
       
       <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      {/* Floating Chat Components */}
+      <ChatButton onClick={handleChatOpen} />
+      <ChatPanel isOpen={isChatOpen} onClose={handleChatClose} />
     </div>
   );
 }
