@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, AlertTriangle, MapPin, QrCode, MessageCircle } from "lucide-react";
+import { Search, AlertTriangle, MapPin, QrCode, MessageCircle, LogIn, LogOut, UserCheck, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,14 +12,31 @@ interface HomeScreenProps {
 }
 
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
 
-  //todo: remove mock functionality 
+  const handleLogin = () => {
+    window.location.href = '/api/login';
+  };
+
+  const handleLogout = () => {
+    window.location.href = '/api/logout';
+  };
+
+  const handleAdminLogin = () => {
+    toast({
+      title: "Admin Login",
+      description: "Redirecting to admin authentication...",
+    });
+    // For now, use the same login flow - in production this could be a separate admin portal
+    window.location.href = '/api/login';
+  };
+
+  // Updated location to RGIPT, Jais, Amethi
   const mockData = {
     status: "SAFE",
-    location: "India Gate, New Delhi",
+    location: "RGIPT, Jais, Amethi, UP",
     alertsCount: 2,
     alerts: [
       { id: "1", text: "Heavy Rainfall expected in City Center", type: "warning" },
@@ -49,16 +66,93 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
               <span className="text-sm font-semibold">
-                {(user as any)?.firstName?.[0] || (user as any)?.email?.[0] || "U"}
+                {isAuthenticated ? ((user as any)?.firstName?.[0] || (user as any)?.email?.[0] || "U") : "G"}
               </span>
             </div>
-            <h1 className="text-xl font-bold" data-testid="text-app-title">Safar Saarthi App</h1>
+            <div>
+              <h1 className="text-xl font-bold" data-testid="text-app-title">Safar Saarthi</h1>
+              <p className="text-xs opacity-90">Tourist Safety Companion</p>
+            </div>
+          </div>
+          
+          {/* Authentication Buttons */}
+          <div className="flex items-center gap-2">
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 animate-pulse"></div>
+            ) : isAuthenticated ? (
+              <Button
+                data-testid="button-logout"
+                onClick={handleLogout}
+                variant="ghost"
+                size="icon"
+                className="text-primary-foreground hover:bg-primary-foreground/20"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            ) : (
+              <>
+                <Button
+                  data-testid="button-user-login"
+                  onClick={handleLogin}
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-foreground/20 text-xs"
+                >
+                  <UserCheck className="h-3 w-3 mr-1" />
+                  User Login
+                </Button>
+                <Button
+                  data-testid="button-admin-login"
+                  onClick={handleAdminLogin}
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-foreground/20 text-xs"
+                >
+                  <Shield className="h-3 w-3 mr-1" />
+                  Admin
+                </Button>
+              </>
+            )}
           </div>
         </div>
         
         <h2 className="text-2xl font-bold mb-4" data-testid="text-welcome">
-          WELCOME, Traveler!
+          {isAuthenticated ? 
+            `WELCOME, ${(user as any)?.firstName || 'Traveler'}!` : 
+            'WELCOME, Traveler!'
+          }
         </h2>
+        
+        {!isAuthenticated && (
+          <div className="mb-4 p-3 bg-primary-foreground/10 rounded-lg">
+            <p className="text-sm opacity-90 mb-2">
+              <LogIn className="h-4 w-4 inline mr-1" />
+              Sign in to access personalized safety features, emergency contacts, and location sharing.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                data-testid="button-main-login"
+                onClick={handleLogin}
+                variant="secondary"
+                size="sm"
+                className="bg-primary-foreground text-primary"
+              >
+                <UserCheck className="h-3 w-3 mr-1" />
+                Sign In as User
+              </Button>
+              <Button
+                data-testid="button-main-admin-login"
+                onClick={handleAdminLogin}
+                variant="secondary"
+                size="sm"
+                className="bg-primary-foreground text-primary"
+              >
+                <Shield className="h-3 w-3 mr-1" />
+                Admin Portal
+              </Button>
+            </div>
+          </div>
+        )}
         
         {/* Search Bar */}
         <div className="relative">

@@ -1,21 +1,30 @@
 import { useState } from "react";
-import { MapPin, Shield, AlertTriangle, Navigation } from "lucide-react";
+import { MapPin, Shield, AlertTriangle, Navigation, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import type { EmergencyContact } from "@shared/schema";
 
 export default function MapScreen() {
   const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
 
-  //todo: remove mock functionality 
-  const mockLocations = {
-    userLocation: { lat: 28.6139, lng: 77.2090, name: "Your Location" },
+  // Fetch emergency contacts from database
+  const { data: emergencyContacts = [], isLoading } = useQuery<EmergencyContact[]>({
+    queryKey: ['/api/emergency-contacts'],
+  });
+
+  // Updated location data for RGIPT, Jais, Amethi area
+  const locationData = {
+    userLocation: { lat: 26.15, lng: 81.51, name: "RGIPT Campus" },
     safeZones: [
-      { id: "police1", lat: 28.6129, lng: 77.2100, name: "Tourist Police Station", type: "police" },
-      { id: "hospital1", lat: 28.6149, lng: 77.2080, name: "AIIMS Emergency", type: "hospital" },
+      { id: "police1", lat: 26.148, lng: 81.508, name: "Jais Police Station", type: "police" },
+      { id: "hospital1", lat: 26.152, lng: 81.515, name: "Amethi District Hospital", type: "hospital" },
+      { id: "campus1", lat: 26.15, lng: 81.51, name: "RGIPT Security", type: "campus_security" },
     ],
     riskZones: [
-      { id: "risk1", lat: 28.6159, lng: 77.2070, name: "Pickpocket hotspot", severity: "medium" },
+      { id: "risk1", lat: 26.155, lng: 81.505, name: "Construction Zone - Exercise Caution", severity: "low" },
+      { id: "risk2", lat: 26.145, lng: 81.52, name: "Heavy Traffic Area", severity: "medium" },
     ]
   };
 
@@ -103,9 +112,10 @@ export default function MapScreen() {
         <Card className="absolute bottom-4 left-4 z-30 bg-background/95 backdrop-blur-sm">
           <CardContent className="p-3">
             <div className="space-y-2 text-sm">
+              <div className="font-medium text-xs mb-2">Map Legend</div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-primary rounded-full"></div>
-                <span>Your Location</span>
+                <span>RGIPT Campus</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-chart-2 rounded-full"></div>
@@ -113,7 +123,7 @@ export default function MapScreen() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-destructive rounded-full"></div>
-                <span>Risk Zones</span>
+                <span>Caution Areas</span>
               </div>
             </div>
           </CardContent>
@@ -126,8 +136,8 @@ export default function MapScreen() {
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="font-semibold text-sm" data-testid="text-marker-title">
-                    {mockLocations.safeZones.find(l => l.id === selectedMarker)?.name ||
-                     mockLocations.riskZones.find(l => l.id === selectedMarker)?.name}
+                    {locationData.safeZones.find(l => l.id === selectedMarker)?.name ||
+                     locationData.riskZones.find(l => l.id === selectedMarker)?.name}
                   </h4>
                   <p className="text-xs text-muted-foreground mt-1">
                     Tap for directions and more info
@@ -142,6 +152,38 @@ export default function MapScreen() {
                 >
                   ×
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Emergency Contacts Panel */}
+        {!isLoading && emergencyContacts.length > 0 && (
+          <Card className="absolute top-4 left-4 z-30 bg-background/95 backdrop-blur-sm max-w-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                Emergency Services Near RGIPT
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {emergencyContacts.slice(0, 4).map((contact) => (
+                  <Button
+                    key={contact.id}
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start text-xs h-8"
+                    onClick={() => window.open(`tel:${contact.phoneNumber}`)}
+                    data-testid={`button-map-contact-${contact.type}`}
+                  >
+                    <Phone className="h-3 w-3 mr-2" />
+                    <div className="flex-1 text-left truncate">
+                      <div className="font-medium">{contact.name}</div>
+                      <div className="text-muted-foreground">{contact.phoneNumber}</div>
+                    </div>
+                  </Button>
+                ))}
               </div>
             </CardContent>
           </Card>
