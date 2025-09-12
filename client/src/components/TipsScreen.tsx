@@ -1,59 +1,28 @@
-import { Shield, AlertTriangle, MapPin, Phone, Eye, Clock } from "lucide-react";
+import { Shield, AlertTriangle, MapPin, Phone, Eye, Clock, Heart, Plane, FileText, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import type { SafetyTip } from "@shared/schema";
 
 export default function TipsScreen() {
-  //todo: remove mock functionality
-  const safetyTips = [
-    {
-      id: "1",
-      title: "Always Stay Alert in Crowded Areas",
-      content: "Keep your belongings secure and be aware of your surroundings, especially in tourist hotspots. Pickpockets often target distracted visitors.",
-      category: "General Safety",
-      priority: "high",
-      icon: Eye
-    },
-    {
-      id: "2", 
-      title: "Share Your Location with Trusted Contacts",
-      content: "Always inform family or friends about your travel plans and current location. Use location sharing features when exploring unfamiliar areas.",
-      category: "Communication",
-      priority: "high",
-      icon: MapPin
-    },
-    {
-      id: "3",
-      title: "Keep Emergency Numbers Handy",
-      content: "Save local emergency numbers, embassy contacts, and tourist helpline numbers in your phone. Know the universal emergency number (112) for most countries.",
-      category: "Emergency Prep",
-      priority: "critical",
-      icon: Phone
-    },
-    {
-      id: "4",
-      title: "Research Local Safety Conditions",
-      content: "Before visiting any destination, research current safety conditions, common scams, and areas to avoid, especially during certain times of day.",
-      category: "Travel Planning",
-      priority: "medium", 
-      icon: Shield
-    },
-    {
-      id: "5",
-      title: "Avoid Displaying Expensive Items",
-      content: "Keep jewelry, expensive electronics, and large amounts of cash hidden. Use hotel safes for valuables and consider using a money belt.",
-      category: "General Safety",
-      priority: "high",
-      icon: AlertTriangle
-    },
-    {
-      id: "6",
-      title: "Plan Your Return Route",
-      content: "Always have a plan for getting back to your accommodation safely, especially when going out at night. Know public transport schedules and taxi options.",
-      category: "Travel Planning", 
-      priority: "medium",
-      icon: Clock
+  // Fetch safety tips from API
+  const { data: safetyTips = [], isLoading } = useQuery<SafetyTip[]>({
+    queryKey: ['/api/safety-tips'],
+  });
+
+  // Map categories to icons
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case "Emergency Prep": return Phone;
+      case "General Safety": return Shield;
+      case "Communication": return Users;
+      case "Travel Planning": return Plane;
+      case "Health & Wellness": return Heart;
+      case "Transportation": return MapPin;
+      case "Documentation": return FileText;
+      default: return Eye;
     }
-  ];
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -70,9 +39,52 @@ export default function TipsScreen() {
       case "General Safety": return "text-orange-600";
       case "Communication": return "text-primary";
       case "Travel Planning": return "text-chart-2";
+      case "Health & Wellness": return "text-chart-3";
+      case "Transportation": return "text-chart-4";
+      case "Documentation": return "text-chart-5";
       default: return "text-muted-foreground";
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 overflow-auto pb-20">
+        <div className="p-4">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold mb-2" data-testid="text-tips-title">Safety Tips</h1>
+            <p className="text-muted-foreground">
+              Essential safety advice for travelers to stay safe and enjoy their journey
+            </p>
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 bg-muted rounded-lg"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                      <div className="flex gap-2">
+                        <div className="h-5 bg-muted rounded w-20"></div>
+                        <div className="h-5 bg-muted rounded w-16"></div>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
+                    <div className="h-3 bg-muted rounded w-full"></div>
+                    <div className="h-3 bg-muted rounded w-5/6"></div>
+                    <div className="h-3 bg-muted rounded w-4/6"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-auto pb-20">
@@ -86,7 +98,7 @@ export default function TipsScreen() {
 
         <div className="space-y-4">
           {safetyTips.map((tip) => {
-            const IconComponent = tip.icon;
+            const IconComponent = getCategoryIcon(tip.category);
             return (
               <Card key={tip.id} className="hover-elevate cursor-pointer" data-testid={`tip-card-${tip.id}`}>
                 <CardHeader className="pb-3">
