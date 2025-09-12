@@ -84,11 +84,22 @@ export const userPreferences = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Chat messages table for AI chatbot
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  role: varchar("role", { length: 20 }).notNull(), // 'user' | 'assistant'
+  content: text("content").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Export schemas for validation
 export const insertSafetyAlertSchema = createInsertSchema(safetyAlerts).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertSafetyTipSchema = createInsertSchema(safetyTips).omit({ id: true, createdAt: true });
 export const insertEmergencyContactSchema = createInsertSchema(emergencyContacts).omit({ id: true, createdAt: true });
 export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({ id: true, updatedAt: true });
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({ id: true, createdAt: true });
 
 // Export types
 export type UpsertUser = typeof users.$inferInsert;
@@ -97,8 +108,10 @@ export type SafetyAlert = typeof safetyAlerts.$inferSelect;
 export type SafetyTip = typeof safetyTips.$inferSelect;
 export type EmergencyContact = typeof emergencyContacts.$inferSelect;
 export type UserPreferences = typeof userPreferences.$inferSelect;
+export type ChatMessage = typeof chatMessages.$inferSelect;
 
 export type InsertSafetyAlert = z.infer<typeof insertSafetyAlertSchema>;
 export type InsertSafetyTip = z.infer<typeof insertSafetyTipSchema>;
 export type InsertEmergencyContact = z.infer<typeof insertEmergencyContactSchema>;
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;

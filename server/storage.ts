@@ -4,20 +4,23 @@ import {
   safetyTips,
   emergencyContacts,
   userPreferences,
+  chatMessages,
   type User,
   type UpsertUser,
   type SafetyAlert,
   type SafetyTip,
   type EmergencyContact,
   type UserPreferences,
+  type ChatMessage,
   type InsertSafetyAlert,
   type InsertSafetyTip,
   type InsertEmergencyContact,
   type InsertUserPreferences,
+  type InsertChatMessage,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -37,6 +40,11 @@ export interface IStorage {
   
   getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
   upsertUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
+  
+  // Chat operations
+  getChatHistory(userId: string, limit?: number): Promise<ChatMessage[]>;
+  addChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  clearChatHistory(userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -107,6 +115,28 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return prefs;
+  }
+
+  // Chat operations
+  async getChatHistory(userId: string, limit: number = 20): Promise<ChatMessage[]> {
+    const messages = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.userId, userId))
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(limit);
+    
+    // Return messages in chronological order (oldest first)
+    return messages.reverse();
+  }
+
+  async addChatMessage(messageData: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db.insert(chatMessages).values(messageData).returning();
+    return message;
+  }
+
+  async clearChatHistory(userId: string): Promise<void> {
+    await db.delete(chatMessages).where(eq(chatMessages.userId, userId));
   }
 }
 
